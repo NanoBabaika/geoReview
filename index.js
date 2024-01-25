@@ -1,3 +1,14 @@
+// Константы 48:20
+const formTemplate = `
+<form id="add-form" action="">
+<input type="text" placeholder="Ваше место" name="place"><br><br>
+<input type="text" placeholder="Ваш никнейм" name="name"><br><br>
+<textarea name="textReview" placeholder="Ваш отзыв"></textarea><br><br>
+<button>Отправить отзыв</button>
+</form>
+`
+
+
 ymaps.ready(init);
 
 
@@ -16,14 +27,32 @@ function init(){
 
 
     myMap.events.add('click', (e) => {
-        console.log(e.get('coords'))
         // здесь открывать балун
+
+        openBalloon(myMap, e.get('coords'), []);
     })
 }
 
 
 async function openBalloon(map, coords, currentGeoObjects) {
-    await map.ballon.open(coords, {
-        content: ``
+
+    await map.balloon.open(coords, {
+        content: `<div class="reviews">Отзывы здесь</div>` + formTemplate
+    })
+
+
+
+    document.querySelector('#add-form').addEventListener('submit', function (e) {
+        e.preventDefault()
+
+
+        const review = {
+            coords,
+            place: this.elements.place.value,
+            author: this.elements.author.value,
+            reviewText: this.elements.reviewText.value
+        }
+
+        console.log(review);
     })
 }
