@@ -42,15 +42,15 @@ async function openBalloon(map, coords, currentGeoObjects) {
 
 
 
-    document.querySelector('#add-form').addEventListener('submit', function (e) {
+    document.querySelector('#add-form').addEventListener('submit', function(e) {
         e.preventDefault()
-
+        debugger;
 
         const review = {
             coords,
             place: this.elements.place.value,
-            author: this.elements.author.value,
-            reviewText: this.elements.reviewText.value
+            author: this.elements.name.value,
+            textReview: this.elements.textReview.value
         }
 
         console.log(review);
