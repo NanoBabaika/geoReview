@@ -1,4 +1,4 @@
-// Константы 48:20
+// Константы 58:20
 const formTemplate = `
 <form id="add-form" action="">
 <input type="text" placeholder="Ваше место" name="place"><br><br>
@@ -33,6 +33,18 @@ function init(){
     })
 }
 
+function getReviewsFormLS() {
+    const reviews = localStorage.reviews;
+
+    return JSON.parse(reviews || '[]');
+}
+
+function renderGeoObjects (map) {
+    for(const review of getReviewsFormLS()) {
+        const placemark = new ymaps.Placemark(review.coords);
+        map.geoObjects.add(placemark);
+    }
+}
 
 async function openBalloon(map, coords, currentGeoObjects) {
 
@@ -44,7 +56,6 @@ async function openBalloon(map, coords, currentGeoObjects) {
 
     document.querySelector('#add-form').addEventListener('submit', function(e) {
         e.preventDefault()
-        debugger;
 
         const review = {
             coords,
@@ -54,5 +65,12 @@ async function openBalloon(map, coords, currentGeoObjects) {
         }
 
         console.log(review);
+
+ 
+        localStorage.reviews = JSON.stringify(...getReviewsFormLS(), review);
+
+        renderGeoObjects(map);
+
+        map.balloon.close();
     })
 }
