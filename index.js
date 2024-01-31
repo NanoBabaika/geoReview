@@ -1,4 +1,4 @@
-// Константы 58:20
+// Константы 01:02
 const formTemplate = `
 <form id="add-form" action="">
 <input type="text" placeholder="Ваше место" name="place"><br><br>
@@ -8,7 +8,7 @@ const formTemplate = `
 </form>
 `
 
-
+let clusterer
 ymaps.ready(init);
 
 
@@ -25,6 +25,8 @@ function init(){
         zoom: 12
     });
 
+    clusterer = new ymaps.Clusterer();
+    renderGeoObjects(myMap);
 
     myMap.events.add('click', (e) => {
         // здесь открывать балун
@@ -64,10 +66,9 @@ async function openBalloon(map, coords, currentGeoObjects) {
             textReview: this.elements.textReview.value
         }
 
-        console.log(review);
-
+     
  
-        localStorage.reviews = JSON.stringify(...getReviewsFormLS(), review);
+        localStorage.reviews = JSON.stringify([...getReviewsFormLS(), review]);
 
         renderGeoObjects(map);
 
