@@ -25,7 +25,14 @@ function init(){
         zoom: 12
     });
 
-    clusterer = new ymaps.Clusterer();
+    clusterer = new ymaps.Clusterer({disableClickZoom: true});
+    clusterer.options.set('hasBalloon', false);
+    clusterer.events.add('click', (e) => {
+        const geoObjectsInClusterer = e.get('target').getGeoObjects()
+        openBalloon(myMap, e.get('coords'), geoObjectsInClusterer)
+    })
+
+
     renderGeoObjects(myMap);
 
     myMap.events.add('click', (e) => {
@@ -41,17 +48,56 @@ function getReviewsFormLS() {
     return JSON.parse(reviews || '[]');
 }
 
+
+
 function renderGeoObjects (map) {
+    const geoObjects = [];
+
     for(const review of getReviewsFormLS()) {
         const placemark = new ymaps.Placemark(review.coords);
-        map.geoObjects.add(placemark);
+
+        placemark.events.add('click', (e) => {
+            e.stopPropagation()
+            openBalloon(map, e.get('coords'), [e.get('target')])
+        })
+
+        geoObjects.push(placemark);
     }
+
+    clusterer.removeAll();
+    map.geoObjects.remove();
+
+
+    clusterer.add(geoObjects);
+    map.geoObjects.add(clusterer);
 }
+
+
+function getReviewList(currentGeoObjects) {
+    let reviewListHTML = '';
+
+    for(const review of getReviewsFormLS()) {
+        if(currentGeoObjects.some((geoObject) => JSON.stringify(geoObject.geometry._coordinates) === JSON.stringify(review.coords))) {
+            reviewListHTML += `
+            <div class="review">
+                <div>Место: ${review.place}</div>
+                <div>Автор: ${review.name}</div>
+                <div>Отзыв: ${review.textReview}</div>
+            </div>
+            `
+
+        }
+    }
+
+    return reviewListHTML;
+}
+
+
 
 async function openBalloon(map, coords, currentGeoObjects) {
 
     await map.balloon.open(coords, {
-        content: `<div class="reviews">Отзывы здесь</div>` + formTemplate
+        content: `<div class="reviews">${getReviewList(currentGeoObjects)}</div>` + formTemplate
     })
 
 
